@@ -2,35 +2,37 @@ CXX := g++
 
 SRC_DIR := src/
 
-CXX_SRC += main.cpp
+CXX_SRC := main.cpp
 
-CXX_OBJ := $(CXX_SRC:%.cpp=%.o)
+BIN_DIR := bin/
 
-BUILD_DIR := bin/
+BIN_NAME := $(BIN_DIR)main
 
-OBJ_DIR := $(BUILD_DIR)obj/
+OBJ_DIR := obj/
+
+CXX_OBJ := $(CXX_SRC:%=$(OBJ_DIR)%.o)
 
 VPATH := $(SRC_DIR):$(OBJ_DIR)
 
 .SUFFIXES: .cpp
 
 .PHONY: all
-all: mkdir binary
+all: $(BIN_NAME)
 
-.PHONY: binary
-binary: $(CXX_OBJ)
-	$(CXX) -o $(BUILD_DIR)main $(addprefix $(OBJ_DIR),$(CXX_OBJ))
 
-.PHONY: mkdir
-mkdir:
-	@mkdir -p $(BUILD_DIR)
+$(BIN_NAME): $(BIN_DIR) $(OBJ_DIR) $(CXX_OBJ)
+	$(CXX) -o $@ $(CXX_OBJ)
+
+$(BIN_DIR):
+	@mkdir -p $(BIN_DIR)
+
+$(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
 
-$(CXX_OBJ): %.o: %.cpp
-	$(CXX) -o $(OBJ_DIR)$@ -c $<
-
+$(CXX_OBJ): $(OBJ_DIR)%.cpp.o : $(SRC_DIR)%.cpp
+	$(CXX) -o $@ -c $<
 
 .PHONY: clean
 clean:
-	-rm -r $(OBJ_DIR)*.*
-	-rm $(BUILD_DIR)main
+	-rm -r $(OBJ_DIR)*
+	-rm $(BIN_NAME)
